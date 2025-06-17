@@ -1,1 +1,25 @@
+# Environment variables
 .env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+afisha_api.log
+*.log
+
+# Data files
+data/*.json
+
+# Service files
+*.service
+
+# System files
+.DS_Store
