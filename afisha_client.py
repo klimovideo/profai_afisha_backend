@@ -20,35 +20,31 @@ class AfishaClient:
         }
     
     def get_cities(self):
-        """Get list of available cities"""
+        """Получение списка городов"""
         url = f"{self.BASE_URL}/cities"
         response = requests.get(url, headers=self.headers, params=self.params)
         response.raise_for_status()
         return response.json()
     
     def get_city(self, city_id):
-        """Get city for id"""
+        """Получение города по его ID"""
         url = f"{self.BASE_URL}/cities/{city_id}"
         response = requests.get(url, headers=self.headers, params=self.params)
         response.raise_for_status()
         return response.json()
     
-    def get_productions(self, city_id, page=1, per_page=20):
-        """Get productions for a specific city"""
-        url = f"{self.BASE_URL}/productions"
+    def get_creations(self, city_id, date_from=None, date_to=None, creation_type=None, limit=None, cursor=None):
+        """Получение всех произведений с разбивкой по страницам"""
+        url = f"{self.BASE_URL}/creations/page"
         params = {
             **self.params,
             "cityId": city_id,
-            "page": page,
-            "perPage": per_page
+            "DateFrom": date_from,
+            "DateTo": date_to,
+            "CreationType": creation_type,
+            "Limit": limit,
+            "Cursor": cursor
         }
         response = requests.get(url, headers=self.headers, params=params)
         response.raise_for_status()
         return response.json()
-    
-    def get_production_details(self, production_id):
-        """Get detailed information about a specific production"""
-        url = f"{self.BASE_URL}/productions/{production_id}"
-        response = requests.get(url, headers=self.headers, params=self.params)
-        response.raise_for_status()
-        return response.json() 

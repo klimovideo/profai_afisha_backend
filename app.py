@@ -58,29 +58,19 @@ async def get_city(city_id: int):
         logger.error(f"Ошибка при получении города по Id: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/events/{city_id}")
-async def get_events(city_id: int, page: int = 1, per_page: int = 20):
-    """Получить список событий для конкретного города"""
+@app.get("/creations/page")
+async def get_creations(city_id: int, date_from=None, date_to=None, creation_type=None, limit=None, cursor=None):
+    """Получить список произведений для конкретного города с разбивкой по страницам"""
     try:
-        logger.info(f"Запрос: получение событий для города {city_id}, страница {page}")
-        events = afisha_client.get_events(city_id, page, per_page)
-        logger.info(f"Успешно получено {len(events.get('items', []))} событий")
-        return events
+        logger.info(f"Запрос: получение произведения для города {city_id}, страница {cursor}")
+        creations = afisha_client.get_creations(city_id, date_from, date_to, creation_type, limit, cursor)
+        logger.info(f"Успешно получено {len(creations['Creations'])} произведений")
+        # logger.info("Успешно получено")
+        return creations
     except Exception as e:
         logger.error(f"Ошибка при получении событий: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/events/{city_id}/{event_id}")
-async def get_event_details(city_id: int, event_id: int):
-    """Получить детальную информацию о событии"""
-    try:
-        logger.info(f"Запрос: получение информации о событии {event_id} в городе {city_id}")
-        event = afisha_client.get_event_details(event_id)
-        logger.info(f"Успешно получена информация о событии {event_id}")
-        return event
-    except Exception as e:
-        logger.error(f"Ошибка при получении информации о событии: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
