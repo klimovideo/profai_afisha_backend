@@ -70,6 +70,18 @@ async def get_creations(city_id: int, date_from=None, date_to=None, creation_typ
     except Exception as e:
         logger.error(f"Ошибка при получении событий: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/places")
+async def get_places(city_id: int, date_from=None, date_to=None, creation_type=None):
+    """Получить список всех площадок города"""
+    try:
+        logger.info(f"Запрос: получение списка площадок для города {city_id}")
+        places = afisha_client.get_places(city_id, date_from, date_to, creation_type)
+        logger.info(f"Успешно получено {len(places)} площадок")
+        return places
+    except Exception as e:
+        logger.error(f"Ошибка при получении событий: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

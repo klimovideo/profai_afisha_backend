@@ -38,12 +38,26 @@ class AfishaClient:
         url = f"{self.BASE_URL}/creations/page"
         params = {
             **self.params,
-            "cityId": city_id,
+            "CityId": city_id,
             "DateFrom": date_from,
             "DateTo": date_to,
             "CreationType": creation_type,
             "Limit": limit,
             "Cursor": cursor
+        }
+        response = requests.get(url, headers=self.headers, params=params)
+        response.raise_for_status()
+        return response.json()
+    
+    def get_places(self, city_id, date_from=None, date_to=None, creation_type=None):
+        """Получение всех площадок"""
+        url = f"{self.BASE_URL}/places"
+        params = {
+            **self.params,
+            "CityId": city_id,
+            "DateFrom": date_from,
+            "DateTo": date_to,
+            "CreationType": creation_type,
         }
         response = requests.get(url, headers=self.headers, params=params)
         response.raise_for_status()
