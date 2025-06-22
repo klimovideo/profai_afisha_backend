@@ -18,23 +18,27 @@ class AfishaClient:
         self.params = {
             "WidgetKey": self.widget_key,
         }
+        
+    #-------------------- Функции эндпоинтов для городов --------------------
     
     def get_cities(self):
-        """Получение списка городов"""
+        """Запрос возвращает все города с открытыми продажами для вашего партнерского аккаунта. По умолчанию возвращаются для всех продаж, начиная с текущей даты, при указании периода - только за указанный период"""
         url = f"{self.BASE_URL}/cities"
         response = requests.get(url, headers=self.headers, params=self.params)
         response.raise_for_status()
         return response.json()
     
     def get_city(self, city_id):
-        """Получение города по его ID"""
+        """Получение города по идентификатору. Не зависит от наличия открытых продаж"""
         url = f"{self.BASE_URL}/cities/{city_id}"
         response = requests.get(url, headers=self.headers, params=self.params)
         response.raise_for_status()
         return response.json()
     
+    #-------------------- Функции эндпоинтов для произведений (событий, мероприятий, фильмов и т.д.) --------------------
+    
     def get_creations(self, city_id, date_from=None, date_to=None, creation_type=None, limit=None, cursor=None):
-        """Получение всех произведений с разбивкой по страницам"""
+        """По умолчанию возвращаются произведения для всех сеансов, начиная с текущей даты, а при указании периода - только за указанный период"""
         url = f"{self.BASE_URL}/creations/page"
         params = {
             **self.params,
@@ -49,8 +53,24 @@ class AfishaClient:
         response.raise_for_status()
         return response.json()
     
+    def get_creation(self, id):
+        """Получение произведения по Id, не учитывает доступность продаж"""
+        url = f"{self.BASE_URL}/creations/{id}"
+        response = requests.get(url, headers=self.headers, params=self.params)
+        response.raise_for_status()
+        return response.json()
+    
+    def get_creation_kinoplan(self, id):
+        """Получение произведения по идентификатору Kinoplan, не учитывает доступность продаж"""
+        url = f"{self.BASE_URL}/creations/kinoplan/{id}"
+        response = requests.get(url, headers=self.headers, params=self.params)
+        response.raise_for_status()
+        return response.json()
+    
+    #-------------------- Функции эндпоинтов для площадок (мест событий) --------------------
+    
     def get_places(self, city_id, date_from=None, date_to=None, creation_type=None):
-        """Получение всех площадок"""
+        """По умолчанию возвращаются площадки для всех сеансов, начиная с текущей даты, а при указании периода - только за указанный период"""
         url = f"{self.BASE_URL}/places"
         params = {
             **self.params,
@@ -60,5 +80,26 @@ class AfishaClient:
             "CreationType": creation_type,
         }
         response = requests.get(url, headers=self.headers, params=params)
+        response.raise_for_status()
+        return response.json()
+    
+    def get_place(self, id):
+        """Получение площадки по идентификатору, не учитывает доступность продаж"""
+        url = f"{self.BASE_URL}/places/{id}"
+        response = requests.get(url, headers=self.headers, params=self.params)
+        response.raise_for_status()
+        return response.json()
+    
+    def get_place_schedule(self, id, date_from=None, date_to=None, cinema_format_date_from=None, cinema_format_date_to=None):
+        """Получение расписания площадки по идентификатору с необязательной фильтрацией по дате сеанса"""
+        url = f"{self.BASE_URL}/places/{id}/schedule"
+        params = {
+            **self.params,
+            "DateFrom": date_from,
+            "DateTo": date_to,
+            "CinemaFormatDateFrom": cinema_format_date_from,
+            "CinemaFormatDateTo": cinema_format_date_to,
+        }
+        response = requests.get(url, headers=self.headers, params=self.params)
         response.raise_for_status()
         return response.json()

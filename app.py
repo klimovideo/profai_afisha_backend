@@ -34,13 +34,15 @@ app.add_middleware(
 afisha_client = AfishaClient()
 
 # Эндпоинты
+#-------------------- Эндпоинты для городов --------------------
+
 @app.get("/cities")
 async def get_cities():
-    """Получить список доступных городов"""
+    """Запрос возвращает все города с открытыми продажами для вашего партнерского аккаунта. По умолчанию возвращаются для всех продаж, начиная с текущей даты, при указании периода - только за указанный период"""
     try:
         logger.info("Запрос: получение списка городов")
         cities = afisha_client.get_cities()
-        logger.info(f"Успешно получено {len(cities)} городов")
+        logger.info(f"Успешно получено городов: {len(cities)}")
         return cities
     except Exception as e:
         logger.error(f"Ошибка при получении списка городов: {str(e)}")
@@ -48,41 +50,93 @@ async def get_cities():
     
 @app.get("/city/{city_id}")
 async def get_city(city_id: int):
-    """Получить город по его Id"""
+    """Получение города по идентификатору. Не зависит от наличия открытых продаж"""
     try:
-        logger.info(f"Запрос: получение города по Id {city_id}")
+        logger.info(f"Запрос: получение города по Id={city_id}")
         city = afisha_client.get_city(city_id)
-        logger.info(f"Успешно получен город {city['Name']}")
+        logger.info(f"Успешно получен город: {city['Name']}")
         return city
     except Exception as e:
         logger.error(f"Ошибка при получении города по Id: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+#-------------------- Эндпоинты для произведений (событий, мероприятий, фильмов и т.д.) --------------------
 
 @app.get("/creations/page")
 async def get_creations(city_id: int, date_from=None, date_to=None, creation_type=None, limit=None, cursor=None):
-    """Получить список произведений для конкретного города с разбивкой по страницам"""
+    """По умолчанию возвращаются произведения для всех сеансов, начиная с текущей даты, а при указании периода - только за указанный период"""
     try:
         logger.info(f"Запрос: получение произведения для города {city_id}, страница {cursor}")
         creations = afisha_client.get_creations(city_id, date_from, date_to, creation_type, limit, cursor)
-        logger.info(f"Успешно получено {len(creations['Creations'])} произведений")
+        logger.info(f"Успешно получено произведений: {len(creations['Creations'])}")
         # logger.info("Успешно получено")
         return creations
     except Exception as e:
-        logger.error(f"Ошибка при получении событий: {str(e)}")
+        logger.error(f"Ошибка при получении произведений: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/creation/{id}")
+async def get_creation(id):
+    """Получение произведения по Id, не учитывает доступность продаж"""
+    try:
+        logger.info(f"Запрос: получение произведения по Id={id}")
+        creation = afisha_client.get_creation(id)
+        logger.info(f"Успешно получено произведение: {creation['Name']}")
+        return creation
+    except Exception as e:
+        logger.info(f"Ошибка при получении произведения: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/creation/kinoplan/{id}")
+async def get_creation(id):
+    """Получение произведения по идентификатору Kinoplan, не учитывает доступность продаж"""
+    try:
+        logger.info(f"Запрос: получение произведения по Kinoplan Id={id}")
+        creation = afisha_client.get_creation_kinoplan(id)
+        logger.info(f"Успешно получено произведение: {creation['Name']}")
+        return creation
+    except Exception as e:
+        logger.info(f"Ошибка при получении произведения Kinoplan: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+#-------------------- Эндпоинты для площадок (мест событий) --------------------
     
 @app.get("/places")
 async def get_places(city_id: int, date_from=None, date_to=None, creation_type=None):
-    """Получить список всех площадок города"""
+    """По умолчанию возвращаются площадки для всех сеансов, начиная с текущей даты, а при указании периода - только за указанный период"""
     try:
-        logger.info(f"Запрос: получение списка площадок для города {city_id}")
+        logger.info(f"Запрос: получение списка площадок для города c Id={city_id}")
         places = afisha_client.get_places(city_id, date_from, date_to, creation_type)
-        logger.info(f"Успешно получено {len(places)} площадок")
+        logger.info(f"Успешно получено площадок: {len(places)}")
         return places
     except Exception as e:
-        logger.error(f"Ошибка при получении событий: {str(e)}")
+        logger.error(f"Ошибка при получении площадок: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@app.get("/place/{id}")
+async def get_place(id):
+    """Получение площадки по идентификатору, не учитывает доступность продаж"""
+    try:
+        logger.info(f"Запрос: получение площадки c Id={id}")
+        place = afisha_client.get_place(id)
+        logger.info(f"Успешно получена площадка: {place['Name']}")
+        return place
+    except Exception as e:
+        logger.error(f"Ошибка при получении площадки: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/place/{id}/schedule")
+async def get_place_schedule(id):
+    """Получение расписания площадки по идентификатору с необязательной фильтрацией по дате сеанса"""
+    try:
+        logger.info(f"Запрос: получение расписания площадки c Id={id}")
+        schedule = afisha_client.get_place_schedule(id)
+        logger.info(f"Успешно получено расписание площадки: ")
+        return schedule
+    except Exception as e:
+        logger.error(f"Ошибка при получении расписания площадки: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
