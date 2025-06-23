@@ -123,3 +123,27 @@ class AfishaClient:
         response = requests.get(url, headers=self.headers, params=params)
         response.raise_for_status()
         return response.json()
+    
+    #-------------------- Функции эндпоинтов для промоакций --------------------
+    
+    def get_promotions(self, availability=None):
+        """Получение списка действующих промоакций"""
+        url = f"{self.BASE_URL}/promotions"
+        params = {
+            **self.params,
+            "PromotionAvailability": availability
+        }
+        response = requests.get(url, headers=self.headers, params=params)
+        response.raise_for_status()
+        return response.json()
+    
+    def get_promotion_sessions(self, id, city_id):
+        """Получение списка сеансов, на которые действует указанная промоакция. Возвращается не более 150000 сеансов"""
+        url = f"{self.BASE_URL}/promotions/{id}/sessions"
+        params = {
+            **self.params,
+            "CityId": city_id
+        }
+        response = requests.get(url, headers=self.headers, params=params)
+        response.raise_for_status()
+        return response.json()

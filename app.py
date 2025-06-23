@@ -150,6 +150,32 @@ async def get_place_schedule(id, date_from=None, date_to=None, cinema_format_dat
         logger.error(f"Ошибка при получении расписания площадки: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+#-------------------- Эндпоинты для промоакций --------------------
+
+@app.get("/promotions")
+async def get_promotions(availability=None):
+    """Получение списка действующих промоакций"""
+    try:
+        logger.info(f"Запрос: получение действующих промоакций")
+        promotions = afisha_client.get_promotions(availability)
+        logger.info(f"Успешно получены промоакции: {len(promotions)}")
+        return promotions
+    except Exception as e:
+        logger.error(f"Ошибка при получении промоакций: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/promotion/{id}/sessions")
+async def get_promotion_sessions(id, city_id):
+    """Получение списка сеансов, на которые действует указанная промоакция. Возвращается не более 150000 сеансов"""
+    try:
+        logger.info(f"Запрос: получение списка сеансов промоакции")
+        sessions = afisha_client.get_promotion_sessions(id, city_id)
+        logger.info(f"Успешно получены сеансы промоакции: {len(sessions)}")
+        return sessions
+    except Exception as e:
+        logger.error(f"Ошибка при получении сеансов промоакции: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     logger.info("Запуск сервера Afisha API")
