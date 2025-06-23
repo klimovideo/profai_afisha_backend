@@ -37,11 +37,11 @@ afisha_client = AfishaClient()
 #-------------------- Эндпоинты для городов --------------------
 
 @app.get("/cities")
-async def get_cities():
+async def get_cities(date_from=None, date_to=None):
     """Запрос возвращает все города с открытыми продажами для вашего партнерского аккаунта. По умолчанию возвращаются для всех продаж, начиная с текущей даты, при указании периода - только за указанный период"""
     try:
         logger.info("Запрос: получение списка городов")
-        cities = afisha_client.get_cities()
+        cities = afisha_client.get_cities(date_from, date_to)
         logger.info(f"Успешно получено городов: {len(cities)}")
         return cities
     except Exception as e:
@@ -88,7 +88,7 @@ async def get_creation(id):
         raise HTTPException(status_code=500, detail=str(e))
     
 @app.get("/creation/kinoplan/{id}")
-async def get_creation(id):
+async def get_creation_kinoplan(id):
     """Получение произведения по идентификатору Kinoplan, не учитывает доступность продаж"""
     try:
         logger.info(f"Запрос: получение произведения по Kinoplan Id={id}")
@@ -97,6 +97,18 @@ async def get_creation(id):
         return creation
     except Exception as e:
         logger.info(f"Ошибка при получении произведения Kinoplan: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/creation/{id}/schedule")
+async def get_creation_schedule(id, city_id=None, date_from=None, date_to=None, cinema_format_date_from=None, cinema_format_date_to=None):
+    """Получение расписания произведения по идентификатору с необязательной фильтрацией по дате сеанса"""
+    try:
+        logger.info(f"Запрос: получение расписания произведения по Id={id}")
+        schedule = afisha_client.get_creation_schedule(id, city_id, date_from, date_to, cinema_format_date_from, cinema_format_date_to)
+        logger.info(f"Успешно получено расписание произведения. Элементов: {len(schedule)}")
+        return schedule
+    except Exception as e:
+        logger.info(f"Ошибка при получении расписания произведения Kinoplan: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
     
 #-------------------- Эндпоинты для площадок (мест событий) --------------------
@@ -127,12 +139,12 @@ async def get_place(id):
         raise HTTPException(status_code=500, detail=str(e))
     
 @app.get("/place/{id}/schedule")
-async def get_place_schedule(id):
+async def get_place_schedule(id, date_from=None, date_to=None, cinema_format_date_from=None, cinema_format_date_to=None):
     """Получение расписания площадки по идентификатору с необязательной фильтрацией по дате сеанса"""
     try:
         logger.info(f"Запрос: получение расписания площадки c Id={id}")
-        schedule = afisha_client.get_place_schedule(id)
-        logger.info(f"Успешно получено расписание площадки: ")
+        schedule = afisha_client.get_place_schedule(id, date_from=None, date_to=None, cinema_format_date_from=None, cinema_format_date_to=None)
+        logger.info(f"Успешно получено расписание площадки. Элементов: {len(schedule)}")
         return schedule
     except Exception as e:
         logger.error(f"Ошибка при получении расписания площадки: {str(e)}")

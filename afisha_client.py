@@ -21,10 +21,15 @@ class AfishaClient:
         
     #-------------------- Функции эндпоинтов для городов --------------------
     
-    def get_cities(self):
+    def get_cities(self, date_from, date_to):
         """Запрос возвращает все города с открытыми продажами для вашего партнерского аккаунта. По умолчанию возвращаются для всех продаж, начиная с текущей даты, при указании периода - только за указанный период"""
         url = f"{self.BASE_URL}/cities"
-        response = requests.get(url, headers=self.headers, params=self.params)
+        params = {
+            **self.params,
+            "DateFrom": date_from,
+            "DateTo": date_to,
+        }
+        response = requests.get(url, headers=self.headers, params=params)
         response.raise_for_status()
         return response.json()
     
@@ -67,6 +72,21 @@ class AfishaClient:
         response.raise_for_status()
         return response.json()
     
+    def get_creation_schedule(self, id, city_id=None, date_from=None, date_to=None, cinema_format_date_from=None, cinema_format_date_to=None):
+        """Получение расписания произведения по идентификатору с необязательной фильтрацией по дате сеанса"""
+        params = {
+            **self.params,
+            "CityId": city_id,
+            "DateFrom": date_from,
+            "DateTo": date_to,
+            "CinemaFormatDateFrom": cinema_format_date_from,
+            "CinemaFormatDateTo": cinema_format_date_to,
+        }
+        url = f"{self.BASE_URL}/creations/{id}/schedule"
+        response = requests.get(url, headers=self.headers, params=params)
+        response.raise_for_status()
+        return response.json()
+    
     #-------------------- Функции эндпоинтов для площадок (мест событий) --------------------
     
     def get_places(self, city_id, date_from=None, date_to=None, creation_type=None):
@@ -100,6 +120,6 @@ class AfishaClient:
             "CinemaFormatDateFrom": cinema_format_date_from,
             "CinemaFormatDateTo": cinema_format_date_to,
         }
-        response = requests.get(url, headers=self.headers, params=self.params)
+        response = requests.get(url, headers=self.headers, params=params)
         response.raise_for_status()
         return response.json()
