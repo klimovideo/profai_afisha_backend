@@ -1,8 +1,15 @@
-from fastapi import FastAPI, HTTPException
+import sys
+import os
+import logging
+
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from afisha_client import AfishaClient
-import logging
-import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "scripts"))
+from get_city import get_city_id
+from clean_json import preprocess_creations
+
 
 # Настройка логирования
 logging.basicConfig(
@@ -63,14 +70,30 @@ async def get_city(city_id: int):
 #-------------------- Эндпоинты для произведений (событий, мероприятий, фильмов и т.д.) --------------------
 
 @app.get("/creations/page")
-async def get_creations(city_id: int, date_from=None, date_to=None, creation_type=None, limit=None, cursor=None):
+async def get_creations(
+            city_id: int = Query(None, description="ID города для поиска произведений."),
+            city_name: str = Query(None, description="Название города (альтернатива city_id)."),
+            date_from: str = Query(None, description="Дата начала периода в формате date-time."),
+            date_to: str = Query(None, description="Дата окончания периода в формате date-time."),
+            creation_type: str = Query(None, description="Тип произведения ('Concert', 'Performance', 'UserEvent', 'Excursion', 'Movie', 'Event', 'Admission', 'SportEvent'"),
+            limit: int = Query(None, description="Количество элементов на странице."),
+            cursor: str = Query(None, description="Курсор для пагинации.")
+):
     """По умолчанию возвращаются произведения для всех сеансов, начиная с текущей даты, а при указании периода - только за указанный период"""
     try:
+        if city_id is None and city_name is not None:
+            # Получаем id по названию города
+            city_id = get_city_id(city_name, from_api=True)
+            if city_id is None:
+                raise HTTPException(status_code=404, detail="Город не найден")
+        elif city_id is None and city_name is None:
+            raise HTTPException(status_code=400, detail="Необходимо указать city_id или city_name")
+        
         logger.info(f"Запрос: получение произведения для города {city_id}, страница {cursor}")
         creations = afisha_client.get_creations(city_id, date_from, date_to, creation_type, limit, cursor)
         logger.info(f"Успешно получено произведений: {len(creations['Creations'])}")
-        # logger.info("Успешно получено")
-        return creations
+        # return creations
+        return preprocess_creations(creations)
     except Exception as e:
         logger.error(f"Ошибка при получении произведений: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -175,6 +198,17 @@ async def get_promotion_sessions(id, city_id):
     except Exception as e:
         logger.error(f"Ошибка при получении сеансов промоакции: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+#-------------------- Ручка для мероприятий по городу --------------------
+# @app.get("/events")
+# async def get_events_city(name_city):
+#     """Получение мероприятий по названию города"""
+#     try:
+#         logger.info(f"Запрос: получение списка мероприятий по названию города")
+#
+#     except Exception as e:
+#         logger.error(f"Ошибка при получении сеансов промоакции: {str(e)}")
+#         raise HTTPException(status_code=500, )
 
 if __name__ == "__main__":
     import uvicorn
