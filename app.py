@@ -2,9 +2,11 @@ import sys
 import os
 import logging
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from afisha_client import AfishaClient
+from pydantic import BaseModel
+from typing import Optional
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "scripts"))
 from get_city import get_city_id
@@ -69,7 +71,7 @@ async def get_city(city_id: int):
     
 #-------------------- Эндпоинты для произведений (событий, мероприятий, фильмов и т.д.) --------------------
 
-@app.get("/creations/page")
+@app.get("/creations/page") ### ОСНОВНОЙ ЭНДПОИНТ ДЛЯ БОТА
 async def get_creations(
             city_id: int = Query(None, description="ID города для поиска произведений."),
             city_name: str = Query(None, description="Название города (альтернатива city_id)."),
@@ -93,6 +95,42 @@ async def get_creations(
         creations = afisha_client.get_creations(city_id, date_from, date_to, creation_type, limit, cursor)
         logger.info(f"Успешно получено произведений: {len(creations['Creations'])}")
         # return creations
+        return preprocess_creations(creations)
+    except Exception as e:
+        logger.error(f"Ошибка при получении произведений: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# POST-эндпоинт для /creations/page
+class CreationsRequest(BaseModel):
+    city_id: Optional[int] = None
+    city_name: Optional[str] = None
+    date_from: Optional[str] = None
+    date_to: Optional[str] = None
+    creation_type: Optional[str] = None
+    limit: Optional[int] = None
+    cursor: Optional[str] = None
+
+@app.post("/creations/page")
+async def get_creations_post(request: CreationsRequest = Body(...)):
+    try:
+        city_id = request.city_id
+        city_name = request.city_name
+        date_from = request.date_from
+        date_to = request.date_to
+        creation_type = request.creation_type
+        limit = request.limit
+        cursor = request.cursor
+
+        if city_id is None and city_name is not None:
+            city_id = get_city_id(city_name, from_api=True)
+            if city_id is None:
+                raise HTTPException(status_code=404, detail="Город не найден")
+        elif city_id is None and city_name is None:
+            raise HTTPException(status_code=400, detail="Необходимо указать city_id или city_name")
+        
+        logger.info(f"Запрос: получение произведения для города {city_id}, страница {cursor}")
+        creations = afisha_client.get_creations(city_id, date_from, date_to, creation_type, limit, cursor)
+        logger.info(f"Успешно получено произведений: {len(creations['Creations'])}")
         return preprocess_creations(creations)
     except Exception as e:
         logger.error(f"Ошибка при получении произведений: {str(e)}")
