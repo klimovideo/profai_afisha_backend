@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "ProfAI_Afisha_Backend"
+version = "0.1.0"
+description = "Backend for afisha api for service ProfAI"
+authors = ["Alexandr <alexandr@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
+black = "^23.1.0"
+ruff = "^0.0.280"
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "W"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
