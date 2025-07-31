@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.dependencies.afisha import get_afisha_client
-from app.schemas.creations import CreationsFilter, CreationsScheduleFilter
+from app.schemas.creations import CreationFilter, CreationScheduleFilter
 from app.services.afisha import AfishaClient
 from app.utils.preprocess import clean_creations
 from app.utils.helpers import get_city_id
@@ -13,15 +13,22 @@ logger = get_logger(__name__)
 
 @router.get('/creations/page')  ### ОСНОВНОЙ ЭНДПОИНТ ДЛЯ БОТА
 async def get_creations(
-    filter: CreationsFilter = Depends(),
+    params: CreationFilter = Depends(),
     afisha: AfishaClient = Depends(get_afisha_client),
 ):
     try:
-        city_id = get_city_id(filter.city_name, from_api=True)
-        if city_id is None:
-            raise HTTPException(status_code=404, detail='Город не найден')
+        if params.city_name:
+            city_id = get_city_id(params.city_name, from_api=True)
+            if city_id is None:
+                raise HTTPException(status_code=404, detail='Город не найден')
+        elif params.city_id:
+            city_id = params.city_id
+        else:
+            raise HTTPException(status_code=400, detail='Необходимо указать city_id или city_name')
 
-        creations = await afisha.creations.get_list(**filter.model_dump(exclude_none=True))
+        params = params.model_dump(exclude_none=True, exclude={'city_name', 'city_id'})
+        logger.info(f'Запрос: получение произведений для города {city_id}, параметры: {params}')
+        creations = await afisha.creations.get_list(city_id=city_id, **params)
         logger.info(f'Успешно получено произведений: {len(creations["Creations"])}')
         return clean_creations(creations)
     except Exception as e:
@@ -91,15 +98,23 @@ async def get_creation_kinoplan(
 @router.get('/creation/{id}/schedule')
 async def get_creation_schedule(
     id,
-    filter: CreationsScheduleFilter = Depends(),
+    params: CreationScheduleFilter = Depends(),
     afisha: AfishaClient = Depends(get_afisha_client),
 ):
-    """Получение расписания произведения по идентификатору с необязательной фильтрацией по дате сеанса"""
     try:
-        logger.info(f'Запрос: получение расписания произведения по Id={id}')
-        schedule = afisha.creations.get_schedule(id, **filter.model_dump(exclude_none=True))
+        if params.city_name:
+            city_id = get_city_id(params.city_name, from_api=True)
+            if city_id is None:
+                raise HTTPException(status_code=404, detail='Город не найден')
+        elif params.city_id:
+            city_id = params.city_id
+        else:
+            raise HTTPException(status_code=400, detail='Необходимо указать city_id или city_name')
+
+        params = params.model_dump(exclude_none=True, exclude={'city_name', 'city_id'})
+        schedule = afisha.creations.get_schedule(id, **params.model_dump(exclude_none=True))
         logger.info(f'Успешно получено расписание произведения. Элементов: {len(schedule)}')
         return schedule
     except Exception as e:
         logger.info(f'Ошибка при получении расписания произведения Kinoplan: {str(e)}')
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail='Внутренняя ошибка сервера')

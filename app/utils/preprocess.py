@@ -45,3 +45,4 @@ def clean_creations(creations):
         filtered_element = {k: element[k] for k in need_keys if k in element}
         filtered.append(filtered_element)
     return filtered
+

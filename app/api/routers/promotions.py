@@ -1,22 +1,21 @@
-import logging
-
-from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.dependencies.afisha import get_afisha_client
 from app.services.afisha import AfishaClient
+from app.schemas.promotions import PromotionsFilter, PromotionSessionFilter
+from app.utils.logger import get_logger
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @router.get('/promotions')
 async def get_promotions(
-    availability=None, afisha: AfishaClient = Depends(get_afisha_client)
+    filter: PromotionsFilter = Depends(),
+    afisha: AfishaClient = Depends(get_afisha_client),
 ):
-    """Получение списка действующих промоакций"""
     try:
-        logger.info('Запрос: получение действующих промоакций')
-        promotions = await afisha.promotions.get_list(availability)
+        promotions = await afisha.promotions.get_list(**filter.model_dump(exclude_none=True))
         logger.info(f'Успешно получены промоакции: {len(promotions)}')
         return promotions
     except Exception as e:
@@ -26,12 +25,12 @@ async def get_promotions(
 
 @router.get('/promotion/{id}/sessions')
 async def get_promotion_sessions(
-    id, city_id, afisha: AfishaClient = Depends(get_afisha_client)
+    id,
+    filter: PromotionSessionFilter = Depends(),
+    afisha: AfishaClient = Depends(get_afisha_client),
 ):
-    """Получение списка сеансов, на которые действует указанная промоакция. Возвращается не более 150000 сеансов"""
     try:
-        logger.info('Запрос: получение списка сеансов промоакции')
-        sessions = await afisha.promotions.get_sessions(id, city_id)
+        sessions = await afisha.promotions.get_sessions(id, **filter.model_dump(exclude_none=True))
         logger.info(f'Успешно получены сеансы промоакции: {len(sessions)}')
         return sessions
     except Exception as e:

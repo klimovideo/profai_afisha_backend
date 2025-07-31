@@ -11,11 +11,11 @@ logger = get_logger(__name__)
 
 @router.get('/cities')
 async def get_cities(
-    filters: CitiesFilter = Depends(),
+    params: CitiesFilter = Depends(),
     afisha: AfishaClient = Depends(get_afisha_client),
 ):
     try:
-        cities = await afisha.cities.get_list(**filters.model_dump(exclude_none=True))
+        cities = await afisha.cities.get_list(**params.model_dump(exclude_none=True))
         logger.info(f'Успешно получено городов: {len(cities)}')
         return cities
     except Exception as e:

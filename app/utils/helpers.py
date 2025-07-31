@@ -37,3 +37,4 @@ async def get_city_id(city_name: str, from_api: Optional[bool] = None):
     if from_api:
         return await _get_id_from_afisha(city_name)
     # return _get_id_from_json(city_name)
+

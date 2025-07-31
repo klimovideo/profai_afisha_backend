@@ -3,16 +3,11 @@ from typing import Optional
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
-class CreationFilter(BaseModel):
-    city_id: Optional[int] = Field(
+class PlacesFilter(BaseModel):
+    city_id: int = Field(
         None,
-        description='ID города для поиска произведений.',
+        description='ID города для поиска площадок.',
         example=123,
-    )
-    city_name: Optional[str] = Field(
-        None,
-        description='Название города.',
-        example='Москва',
     )
     date_from: Optional[str] = Field(
         None,
@@ -29,17 +24,6 @@ class CreationFilter(BaseModel):
         description="Тип произведения (например, 'Concert', 'Performance', 'Movie', 'Event' и т.д.).",
         example='Movie',
     )
-    limit: Optional[int] = Field(
-        None,
-        description='Количество элементов на странице.',
-        example=10,
-        ge=1,
-    )
-    cursor: Optional[str] = Field(
-        None,
-        description='Курсор для пагинации.',
-        example='abc123',
-    )
 
     @field_validator('date_to')
     def validate_date_range(cls, v, info: ValidationInfo):
@@ -49,36 +33,26 @@ class CreationFilter(BaseModel):
         return v
 
 
-class CreationScheduleFilter(BaseModel):
-    city_id: Optional[int] = Field(
-        default=None,
-        description='ID города, по которому фильтруется расписание.',
-        example=6,
-    )
-    city_name: Optional[str] = Field(
-        default=None,
-        description='Название города, по которому фильтруется расписание.',
-        example='Москва',
-    )
+class PlaceScheduleFilter(BaseModel):
     date_from: Optional[str] = Field(
-        default=None,
-        description='Дата начала периода расписания (формат YYYY-MM-DD)',
+        None,
+        description='Дата начала периода в формате (YYYY-MM-DD).',
         example='2024-08-01',
     )
     date_to: Optional[str] = Field(
-        default=None,
-        description='Дата окончания периода расписания (формат YYYY-MM-DD)',
+        None,
+        description='Дата окончания периода в формате (YYYY-MM-DD).',
         example='2024-08-15',
     )
     cinema_format_date_from: Optional[str] = Field(
-        default=None,
-        description='Начальная дата для форматированных дат кинотеатра (формат YYYY-MM-DD)',
-        example='2024-08-01',
+        None,
+        description='Дата начала периода в формате (YYYY.MM.DD).',
+        example='2024.08.01',
     )
     cinema_format_date_to: Optional[str] = Field(
-        default=None,
-        description='Конечная дата для форматированных дат кинотеатра (формат YYYY-MM-DD)',
-        example='2024-08-10',
+        None,
+        description='Дата окончания периода в формате (YYYY.MM.DD).',
+        example='2024.08.15',
     )
 
     @field_validator('date_to')
