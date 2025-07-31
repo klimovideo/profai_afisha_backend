@@ -25,8 +25,8 @@ jobs:
         ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
           cd /home/afisha_api
           git pull
-          docker stop fastapi-afisha || true
-          docker rm fastapi-afisha || true
-          docker build -t fastapi-afisha .
-          docker run -d --name fastapi-afisha -p 9000:8001 fastapi-afisha
+          sudo docker stop fastapi-afisha || true
+          sudo docker rm fastapi-afisha || true
+          sudo docker build -t fastapi-afisha .
+          sudo docker run -d --name fastapi-afisha -p 9000:8001 fastapi-afisha
         EOF
