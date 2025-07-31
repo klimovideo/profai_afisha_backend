@@ -1,4 +1,4 @@
-def preprocess_creations(creations):
+def clean_creations(creations):
     elements = creations['Creations']
 
     all_keys = [
