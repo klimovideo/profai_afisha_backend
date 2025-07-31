@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from app.dependencies.afisha import get_afisha_client
-from app.services.afisha_client import AfishaClient
+from app.services.afisha import AfishaClient
 
 from .json_cities import read_cities_from_json
 
