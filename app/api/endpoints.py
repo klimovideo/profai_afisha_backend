@@ -26,7 +26,7 @@ async def get_cities(
     """Запрос возвращает все города с открытыми продажами для вашего партнерского аккаунта. По умолчанию возвращаются для всех продаж, начиная с текущей даты, при указании периода - только за указанный период"""
     try:
         logger.info('Запрос: получение списка городов')
-        cities = afisha_client.get_cities(date_from, date_to)
+        cities = await afisha_client.get_cities(date_from, date_to)
         logger.info(f'Успешно получено городов: {len(cities)}')
         return cities
     except Exception as e:
@@ -39,7 +39,7 @@ async def get_city(city_id: int, afisha_client: AfishaClient = Depends(get_afish
     """Получение города по идентификатору. Не зависит от наличия открытых продаж"""
     try:
         logger.info(f'Запрос: получение города по Id={city_id}')
-        city = afisha_client.get_city(city_id)
+        city = await afisha_client.get_city(city_id)
         logger.info(f'Успешно получен город: {city["Name"]}')
         return city
     except Exception as e:
@@ -75,7 +75,7 @@ async def get_creations(
             raise HTTPException(status_code=400, detail='Необходимо указать city_id или city_name')
 
         logger.info(f'Запрос: получение произведения для города {city_id}, страница {cursor}')
-        creations = afisha_client.get_creations(
+        creations = await afisha_client.get_creations(
             city_id, date_from, date_to, creation_type, limit, cursor
         )
         logger.info(f'Успешно получено произведений: {len(creations["Creations"])}')
@@ -107,7 +107,7 @@ async def get_creations_post(
             raise HTTPException(status_code=400, detail='Необходимо указать city_id или city_name')
 
         logger.info(f'Запрос: получение произведения для города {city_id}, страница {cursor}')
-        creations = afisha_client.get_creations(
+        creations = await afisha_client.get_creations(
             city_id, date_from, date_to, creation_type, limit, cursor
         )
         logger.info(f'Успешно получено произведений: {len(creations["Creations"])}')
@@ -125,7 +125,7 @@ async def get_creation(
     """Получение произведения по Id, не учитывает доступность продаж"""
     try:
         logger.info(f'Запрос: получение произведения по Id={id}')
-        creation = afisha_client.get_creation(id)
+        creation = await afisha_client.get_creation(id)
         logger.info(f'Успешно получено произведение: {creation["Name"]}')
         return creation
     except Exception as e:
@@ -141,7 +141,7 @@ async def get_creation_kinoplan(
     """Получение произведения по идентификатору Kinoplan, не учитывает доступность продаж"""
     try:
         logger.info(f'Запрос: получение произведения по Kinoplan Id={id}')
-        creation = afisha_client.get_creation_kinoplan(id)
+        creation = await afisha_client.get_creation_kinoplan(id)
         logger.info(f'Успешно получено произведение: {creation["Name"]}')
         return creation
     except Exception as e:
@@ -186,7 +186,7 @@ async def get_places(
     """По умолчанию возвращаются площадки для всех сеансов, начиная с текущей даты, а при указании периода - только за указанный период"""
     try:
         logger.info(f'Запрос: получение списка площадок для города c Id={city_id}')
-        places = afisha_client.get_places(city_id, date_from, date_to, creation_type)
+        places = await afisha_client.get_places(city_id, date_from, date_to, creation_type)
         logger.info(f'Успешно получено площадок: {len(places)}')
         return places
     except Exception as e:
@@ -199,7 +199,7 @@ async def get_place(id, afisha_client: AfishaClient = Depends(get_afisha_client)
     """Получение площадки по идентификатору, не учитывает доступность продаж"""
     try:
         logger.info(f'Запрос: получение площадки c Id={id}')
-        place = afisha_client.get_place(id)
+        place = await afisha_client.get_place(id)
         logger.info(f'Успешно получена площадка: {place["Name"]}')
         return place
     except Exception as e:
@@ -219,7 +219,7 @@ async def get_place_schedule(
     """Получение расписания площадки по идентификатору с необязательной фильтрацией по дате сеанса"""
     try:
         logger.info(f'Запрос: получение расписания площадки c Id={id}')
-        schedule = afisha_client.get_place_schedule(
+        schedule = await afisha_client.get_place_schedule(
             id,
             date_from=None,
             date_to=None,
@@ -243,7 +243,7 @@ async def get_promotions(
     """Получение списка действующих промоакций"""
     try:
         logger.info('Запрос: получение действующих промоакций')
-        promotions = afisha_client.get_promotions(availability)
+        promotions = await afisha_client.get_promotions(availability)
         logger.info(f'Успешно получены промоакции: {len(promotions)}')
         return promotions
     except Exception as e:
@@ -258,7 +258,7 @@ async def get_promotion_sessions(
     """Получение списка сеансов, на которые действует указанная промоакция. Возвращается не более 150000 сеансов"""
     try:
         logger.info('Запрос: получение списка сеансов промоакции')
-        sessions = afisha_client.get_promotion_sessions(id, city_id)
+        sessions = await afisha_client.get_promotion_sessions(id, city_id)
         logger.info(f'Успешно получены сеансы промоакции: {len(sessions)}')
         return sessions
     except Exception as e:
