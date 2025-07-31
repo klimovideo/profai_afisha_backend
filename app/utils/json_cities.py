@@ -4,7 +4,7 @@ import os
 from fastapi import Depends
 
 from app.dependencies.afisha import get_afisha_client
-from app.services.afisha_client import AfishaClient
+from app.services.afisha import AfishaClient
 
 path_file = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'cities.json'

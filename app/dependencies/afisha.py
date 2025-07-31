@@ -1,8 +1,8 @@
-from fastapi import Request
-from app.services.afisha_client import AfishaClient
+# app/dependencies/afisha.py
 
-def get_afisha_client(request: Request) -> AfishaClient:
-    afisha = request.app.state.afisha_client
-    if not afisha:
-        raise ValueError("AfishaClient is not initialized in the application state.")
-    return afisha
+from fastapi import Request
+from app.services.afisha import AfishaClient
+
+
+async def get_afisha_client(request: Request) -> AfishaClient:
+    return request.app.state.afisha_client

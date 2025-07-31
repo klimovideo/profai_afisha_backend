@@ -5,9 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import router as api_router
 from app.core.config import settings
-from app.services.afisha_client import AfishaClient
-
-# setup_logging()
+from app.services.afisha import AfishaClient
 
 
 @asynccontextmanager
@@ -21,8 +19,9 @@ app = FastAPI(
     title=settings.app_name,
     description='Сервис для работы с API Афиши',
     version=settings.version,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
+
 
 app.include_router(api_router)
 
@@ -33,5 +32,3 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-
-

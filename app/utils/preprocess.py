@@ -1,4 +1,4 @@
-def preprocess_creations(creations):
+def clean_creations(creations):
     elements = creations['Creations']
 
     all_keys = [
@@ -45,3 +45,4 @@ def preprocess_creations(creations):
         filtered_element = {k: element[k] for k in need_keys if k in element}
         filtered.append(filtered_element)
     return filtered
+
