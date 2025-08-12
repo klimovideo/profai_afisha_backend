@@ -1,8 +1,5 @@
 from datetime import date, datetime, time, timedelta
 from typing import Optional, Any
-from app.utils.logger import get_logger
-
-logger = get_logger
 
 
 def _get_city_id(city_name: str, cities: dict):
@@ -15,10 +12,11 @@ def _get_city_id(city_name: str, cities: dict):
 
 
 def _convert_dates(
-    date_from: Optional[date],
-    date_to: Optional[date],
+    date_from: Optional[date] | Optional[str], date_to: Optional[date] | Optional[str]
 ) -> tuple[Optional[datetime], Optional[datetime]]:
-    def to_datetime(d: Optional[date]) -> Optional[datetime]:
+    def to_datetime(d):
+        if isinstance(d, str):
+            d = datetime.strptime(d, '%Y-%m-%d').date()
         return datetime.combine(d, time.min) if d else None
 
     date_from_dt = to_datetime(date_from)
@@ -50,8 +48,6 @@ def transform_params(params: dict[str, Any], cities: Optional[dict] = None) -> d
     # Обработка города
     city_name = params.get('city_name')
     city_id = params.get('city_id')
-    logger.info(f'city_name {city_name}')
-    logger.info(f'city_id {city_id}')
 
     if cities and city_name:
         out_params['CityId'] = _get_city_id(city_name, cities)
@@ -60,8 +56,6 @@ def transform_params(params: dict[str, Any], cities: Optional[dict] = None) -> d
 
     date_from_raw = params.get('date_from')
     date_to_raw = params.get('date_to')
-    logger.info(f'date_from_raw {date_from_raw}')
-    logger.info(f'date_to_raw {date_to_raw}')
 
     if date_from_raw or date_to_raw:
         date_from, date_to = _convert_dates(date_from_raw, date_to_raw)

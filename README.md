@@ -2,6 +2,29 @@
 
 Веб-сервис для работы с API Афиши, построенный на FastAPI.
 
+## Структура папок
+
+```
+afisha_api/
+├── app/
+│   ├── api/ # Маршруты и роутеры FastAPI
+│   │   ├── router.py
+│   │   └── routers/
+│   ├── core/ # Конфигурация приложения
+│   ├── dependencies/ # Зависимости FastAPI
+│   ├── main.py # Точка входа приложения
+│   ├── schemas/# Pydantic-схемы
+│   ├── services/ # Логика работы с афишой
+│   │   └── afisha/
+│   ├── tests/ # Тесты и тестовые данные
+│   │   └── data/
+│   └── utils/ # Вспомогательные функции и логгер
+├── Dockerfile
+├── pyproject.toml
+├── requirements.txt
+└── README.md
+```
+
 ## Установка на сервере
 
 1. Создайте виртуальное окружение:
@@ -60,34 +83,3 @@ sudo systemctl status afisha-api
 ### Документация API
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
-
-### Доступные эндпоинты:
-
-1. `GET /cities`
-   - Получить список доступных городов
-
-2. `GET /events/{city_id}`
-   - Получить список событий для конкретного города
-   - Параметры:
-     - `page` (опционально): номер страницы (по умолчанию 1)
-     - `per_page` (опционально): количество событий на странице (по умолчанию 20)
-
-3. `GET /events/{city_id}/{event_id}`
-   - Получить детальную информацию о конкретном событии
-
-## Примеры использования
-
-### Получение списка городов
-```bash
-curl http://localhost:8000/cities
-```
-
-### Получение событий в городе
-```bash
-curl http://localhost:8000/events/1?page=1&per_page=20
-```
-
-### Получение информации о событии
-```bash
-curl http://localhost:8000/events/1/123
-``` 
