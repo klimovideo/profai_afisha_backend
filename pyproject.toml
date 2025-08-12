@@ -26,4 +26,5 @@ ignore = ["E501"]
 quote-style = "single"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["app/tests"]
+pythonpath = "."
