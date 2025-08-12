@@ -47,9 +47,13 @@ def transform_params(
 
     # Приводим к dict
     if isinstance(params, BaseModel):
-        params = params.model_dump(exclude_none=True)
+        params_dict = params.model_dump(exclude_none=True)
     else:
-        params = {k: v for k, v in params.items() if v is not None}
+        params_dict = {k: v for k, v in params.items() if v is not None}
+
+    params = {
+        k: v for k, v in params_dict.items() if not (isinstance(v, str) and v.startswith('${'))
+    }
 
     # Обработка города
     city_name = params.get('city_name')
