@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     app_name: str = 'Backend Afisha API Service'
     version: str = '1.0.0'
     host: str = '0.0.0.0'
-    port: int = 8001
+    port: int = 8000
 
     # Логирование
     log_level: str = 'INFO'
