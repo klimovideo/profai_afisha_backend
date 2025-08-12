@@ -17,9 +17,7 @@ async def get_cities(
     afisha: AfishaClient = Depends(get_afisha_client),
 ):
     try:
-        logger.info(f'Трансформация входных параметров {params}')
         request_params = transform_params(params=params.model_dump())
-        logger.info(f'Выходные параметры {request_params}')
         response = await afisha.cities.get_list(request_params)
         return response
     except Exception:
