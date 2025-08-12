@@ -1,4 +1,3 @@
-# services/afisha/base.py
 from httpx import AsyncClient, Response
 from app.core.config import settings
 
