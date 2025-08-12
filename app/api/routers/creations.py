@@ -21,6 +21,7 @@ async def get_creations(
         response = clean_creations(await afisha.creations.get_list(request_params))
         return response
     except Exception:
+        logger.error('Ошибка при получении списка произведений', exc_info=True)
         raise HTTPException(status_code=500, detail='Внутренняя ошибка сервера')
 
 
@@ -33,6 +34,7 @@ async def get_creation(
         response = await afisha.creations.get_by_id(id)
         return response
     except Exception:
+        logger.error(f'Ошибка при получении произведения с ID {id}', exc_info=True)
         raise HTTPException(status_code=500, detail='Внутренняя ошибка сервера')
 
 
@@ -45,6 +47,7 @@ async def get_creation_kinoplan(
         response = await afisha.creations.get_by_kinoplan_id(id)
         return response
     except Exception:
+        logger.error(f'Ошибка при получении произведения с Kinoplan ID {id}', exc_info=True)
         raise HTTPException(status_code=500, detail='Внутренняя ошибка сервера')
 
 
@@ -60,4 +63,5 @@ async def get_creation_schedule(
         response = afisha.creations.get_schedule(id, params=request_params)
         return response
     except Exception:
+        logger.error(f'Ошибка при получении расписания произведения с ID {id}', exc_info=True)
         raise HTTPException(status_code=500, detail='Внутренняя ошибка сервера')

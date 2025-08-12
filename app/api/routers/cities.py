@@ -21,6 +21,7 @@ async def get_cities(
         response = await afisha.cities.get_list(request_params)
         return response
     except Exception:
+        logger.error('Ошибка при получении списка городов', exc_info=True)
         raise HTTPException(status_code=500, detail='Внутренняя ошибка сервера')
 
 
@@ -33,4 +34,5 @@ async def get_city(
         response = await afisha.cities.get_by_id(city_id)
         return response
     except Exception:
+        logger.error(f'Ошибка при получении города с ID {city_id}', exc_info=True)
         raise HTTPException(status_code=500, detail='Внутренняя ошибка сервера')
