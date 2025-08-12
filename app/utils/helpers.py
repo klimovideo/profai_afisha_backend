@@ -45,6 +45,8 @@ def transform_params(params: dict[str, Any], cities: Optional[dict] = None) -> d
     """
     out_params = {}
 
+    params = params.dict(exclude_none=True)
+
     # Обработка города
     city_name = params.get('city_name')
     city_id = params.get('city_id')
