@@ -1,5 +1,7 @@
 from datetime import date, datetime, time, timedelta
-from typing import Optional, Any
+from typing import Optional, Any, Union
+
+from pydantic import BaseModel
 
 
 def _get_city_id(city_name: str, cities: dict):
@@ -33,19 +35,21 @@ def _to_camel_case(snake: str) -> str:
     return ''.join(p.capitalize() for p in parts)
 
 
-def transform_params(params: dict[str, Any], cities: Optional[dict] = None) -> dict[str, Any]:
-    """Преобразует входные параметры запроса в формат, необходимый для API Афишы.
-
-    Args:
-        params (dict[str, Any]): Параметры запроса:
-        cities (Optional[dict], optional): Если передан данный параметр, то нужно найти id города из этого списка.
-
-    Returns:
-        dict[str, Any]: _Преобразованные параметры запроса для API Афишы.
+def transform_params(
+    params: Union[dict[str, Any], BaseModel], cities: Optional[dict] = None
+) -> dict[str, Any]:
     """
+    Преобразует входные параметры запроса в формат, необходимый для API Афиши.
+    Принимает как dict, так и Pydantic-модель.
+    """
+
     out_params = {}
 
-    params = params.dict(exclude_none=True)
+    # Приводим к dict
+    if isinstance(params, BaseModel):
+        params = params.model_dump(exclude_none=True)
+    else:
+        params = {k: v for k, v in params.items() if v is not None}
 
     # Обработка города
     city_name = params.get('city_name')
@@ -56,9 +60,9 @@ def transform_params(params: dict[str, Any], cities: Optional[dict] = None) -> d
     elif city_id:
         out_params['CityId'] = city_id
 
+    # Обработка дат
     date_from_raw = params.get('date_from')
     date_to_raw = params.get('date_to')
-
     if date_from_raw or date_to_raw:
         date_from, date_to = _convert_dates(date_from_raw, date_to_raw)
 
@@ -67,6 +71,7 @@ def transform_params(params: dict[str, Any], cities: Optional[dict] = None) -> d
         if date_to:
             out_params['DateTo'] = date_to.isoformat()
 
+    # Преобразование остальных параметров
     # keys_afisha = ['CityId', 'DateFrom', 'DateTo', 'CreationType', 'Limit', 'Cursor', 'CinemaFormatDateFrom', 'CinemaFormatDateTo']
     passthrough_keys = ['creation_type', 'limit', 'cursor']  # Прочие поля
     for key in passthrough_keys:
