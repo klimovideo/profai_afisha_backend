@@ -60,7 +60,7 @@ async def get_creation_schedule(
     try:
         cities_response = await afisha.cities.get_list()
         request_params = transform_params(params=params, cities=cities_response)
-        response = afisha.creations.get_schedule(id, params=request_params)
+        response = await afisha.creations.get_schedule(id, params=request_params)
         return response
     except Exception:
         logger.error(f'Ошибка при получении расписания произведения с ID {id}', exc_info=True)

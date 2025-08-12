@@ -14,5 +14,5 @@ class CreationsClient(AfishaBaseClient):
     async def get_by_kinoplan_id(self, id):
         return await self._get(endpoint=f'/creations/kinoplan/{id}')
 
-    async def get_schedule(self, id, params: CreationScheduleRequest):
+    async def get_schedule(self, id, params: CreationScheduleRequest = None):
         return await self._get(endpoint=f'/creations/{id}/schedule', extra_params=params)
