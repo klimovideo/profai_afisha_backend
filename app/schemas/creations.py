@@ -5,13 +5,13 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class CreationFilter(BaseModel): # Фильтрация параметров получаемые самой FastAPI
-    city_id: Optional[int] = Field(description='ID города для поиска')
-    city_name: Optional[str] = Field(description='Название города.')
-    date_from: Optional[str] = Field(description='Дата начала периода в формате (YYYY-MM-DD).')
-    date_to: Optional[str] = Field(description='Дата окончания периода в формате (YYYY-MM-DD).')
-    creation_type: Optional[str] = Field(description="Тип произведения 'Concert', 'Movie' и т.д.")
-    limit: Optional[int] = Field(description='Количество элементов на странице.', ge=1)
-    cursor: Optional[str] = Field(description='Курсор для пагинации.')
+    city_id: Optional[int] = Field(None, description='ID города для поиска')
+    city_name: Optional[str] = Field(None, description='Название города.')
+    date_from: Optional[str] = Field(None, description='Дата начала периода в формате (YYYY-MM-DD).')
+    date_to: Optional[str] = Field(None, description='Дата окончания периода в формате (YYYY-MM-DD).')
+    creation_type: Optional[str] = Field(None, description="Тип произведения 'Concert', 'Movie' и т.д.")
+    limit: Optional[int] = Field(None, description='Количество элементов на странице.', ge=1)
+    cursor: Optional[str] = Field(None, description='Курсор для пагинации.')
 
     @field_validator('date_to')
     def validate_date_range(cls, v, info: ValidationInfo):
@@ -22,10 +22,10 @@ class CreationFilter(BaseModel): # Фильтрация параметров п�
 
 
 class CreationScheduleFilter(BaseModel): # Фильтрация параметров получаемые самой FastAPI
-    city_id: Optional[int] = Field(description='ID города, по которому фильтруется расписание.')
-    city_name: Optional[str] = Field(description='Название города.')
-    date_from: Optional[str] = Field(description='Дата начала расписания (формат YYYY-MM-DD)')
-    date_to: Optional[str] = Field(description='Дата окончания расписания (формат YYYY-MM-DD)')
+    city_id: Optional[int] = Field(None, description='ID города, по которому фильтруется расписание.')
+    city_name: Optional[str] = Field(None, description='Название города.')
+    date_from: Optional[str] = Field(None, description='Дата начала расписания (формат YYYY-MM-DD)')
+    date_to: Optional[str] = Field(None, description='Дата окончания расписания (формат YYYY-MM-DD)')
     cinema_format_date_from: Optional[str] = Field(
         description='Начальная дата для форматированных дат кинотеатра (формат YYYY-MM-DD)'
     )
@@ -59,7 +59,6 @@ class CreationsRequest(BaseModel): # Фильтрация параметров �
 
 class CreationScheduleRequest(BaseModel): # Фильтрация параметров отправляемые в сервис Афиши
     CityId: Optional[int] = None
-    CityName: Optional[str] = None
     DateFrom: Optional[datetime] = None
     DateTo: Optional[datetime] = None
     CinemaFormatDateFrom: Optional[datetime] = None

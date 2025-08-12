@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8001
 
 # Команда запуска uvicorn с указанием модуля и хоста/порта из настроек
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
