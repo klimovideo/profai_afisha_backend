@@ -5,7 +5,7 @@ from .base import AfishaBaseClient
 
 
 class CitiesClient(AfishaBaseClient):
-    async def get_list(self, params: CitiesRequest):
+    async def get_list(self, params: CitiesRequest = None):
         return await self._get(endpoint='/cities', extra_params=params)
 
     async def get_by_id(self, city_id: int):
