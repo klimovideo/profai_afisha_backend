@@ -19,12 +19,12 @@ class CreationFilter(BaseModel):  # Фильтрация параметров п
     limit: Optional[int] = Field(None, description='Количество элементов на странице.', ge=1)
     cursor: Optional[str] = Field(None, description='Курсор для пагинации.')
 
-    @field_validator('date_to')
-    def validate_date_range(cls, v, info: ValidationInfo):
-        date_from = info.data.get('date_from')
-        if v and date_from and v < date_from:
-            raise ValueError('date_to не может быть раньше date_from')
-        return v
+    # @field_validator('date_to')
+    # def validate_date_range(cls, v, info: ValidationInfo):
+    #     date_from = info.data.get('date_from')
+    #     if v and date_from and v < date_from:
+    #         raise ValueError('date_to не может быть раньше date_from')
+    #     return v
 
 
 class CreationScheduleFilter(BaseModel):  # Фильтрация параметров получаемые самой FastAPI
@@ -43,19 +43,19 @@ class CreationScheduleFilter(BaseModel):  # Фильтрация парамет�
         None, description='Конечная дата для форматированных дат кинотеатра (формат YYYY-MM-DD)'
     )
 
-    @field_validator('date_to')
-    def validate_date_range(cls, v, info: ValidationInfo):
-        date_from = info.data.get('date_from')
-        if v and date_from and v < date_from:
-            raise ValueError('date_to не может быть раньше date_from')
-        return v
+    # @field_validator('date_to')
+    # def validate_date_range(cls, v, info: ValidationInfo):
+    #     date_from = info.data.get('date_from')
+    #     if v and date_from and v < date_from:
+    #         raise ValueError('date_to не может быть раньше date_from')
+    #     return v
 
-    @field_validator('cinema_format_date_to')
-    def validate_cinema_format_date_range(cls, v, info: ValidationInfo):
-        d_from = info.data.get('cinema_format_date_from')
-        if v and d_from and v < d_from:
-            raise ValueError('cinema_format_date_to не может быть раньше cinema_format_date_from')
-        return v
+    # @field_validator('cinema_format_date_to')
+    # def validate_cinema_format_date_range(cls, v, info: ValidationInfo):
+    #     d_from = info.data.get('cinema_format_date_from')
+    #     if v and d_from and v < d_from:
+    #         raise ValueError('cinema_format_date_to не может быть раньше cinema_format_date_from')
+    #     return v
 
 
 class CreationsRequest(BaseModel):  # Фильтрация параметров отправляемые в сервис Афиши
