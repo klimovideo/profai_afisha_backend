@@ -16,7 +16,7 @@ class CreationFilter(BaseModel):  # Фильтрация параметров п
     creation_type: Optional[str] = Field(
         None, description="Тип произведения 'Concert', 'Movie' и т.д."
     )
-    limit: Optional[int] = Field(None, description='Количество элементов на странице.', ge=1)
+    limit: Optional[int] = Field(20, description='Количество элементов на странице.', ge=1, le=100)
     cursor: Optional[str] = Field(None, description='Курсор для пагинации.')
 
     # @field_validator('date_to')
@@ -63,7 +63,7 @@ class CreationsRequest(BaseModel):  # Фильтрация параметров 
     DateFrom: Optional[datetime] = None
     DateTo: Optional[datetime] = None
     CreationType: Optional[str] = None
-    Limit: Optional[int] = None
+    Limit: Optional[int] = 20
     Cursor: Optional[str] = None
 
 

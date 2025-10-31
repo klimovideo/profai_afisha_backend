@@ -88,31 +88,6 @@ def transform_params(
 def clean_creations(creations):
     elements = creations['Creations']
 
-    all_keys = [
-        'AfishaPriority',
-        'Genres',
-        'Duration',
-        'Rating',
-        'KinoplanId',
-        'Images',
-        'ProductionYear',
-        'Name',
-        'AfishaCreationUrl',
-        'Videos',
-        'ReleaseDate',
-        'ShortDescription',
-        'Description',
-        'AfishaId',
-        'AgeRestriction',
-        'AfishaClassId',
-        'MainPhotoCrops',
-        'Id',
-        'Participants',
-        'Country',
-        'Type',
-        'DurationDescription',
-    ]
-
     need_keys = [
         'Id',
         'Type',
@@ -131,4 +106,12 @@ def clean_creations(creations):
     for element in elements:
         filtered_element = {k: element[k] for k in need_keys if k in element}
         filtered.append(filtered_element)
-    return filtered
+    
+    return {
+        'items': filtered,
+        'pagination': {
+            'has_more': creations.get('HasMore', False),
+            'next_cursor': creations.get('NextCursor'),
+            'total_count': len(filtered)
+        }
+    }

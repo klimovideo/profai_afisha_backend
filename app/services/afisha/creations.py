@@ -6,6 +6,8 @@ from .base import AfishaBaseClient
 
 class CreationsClient(AfishaBaseClient):
     async def get_list(self, params: CreationsRequest = None):
+        if params is None:
+            params = CreationsRequest()
         return await self._get(endpoint='/creations/page', extra_params=params)
 
     async def get_by_id(self, id):
